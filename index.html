@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portal de Simulações</title>
+    <style>
+        /* Body Styling */
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(135deg, #f4f4f9, #e0e7ff);
+            color: #333;
+            overflow-x: hidden;
+        }
+
+        /* Header Styling */
+        header {
+            background: linear-gradient(90deg, #007BFF, #0056b3);
+            color: white;
+            padding: 1.5rem 0;
+            text-align: center;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        header h1 {
+            font-size: 2.5rem;
+            margin: 0;
+        }
+        header p {
+            margin: 0.5rem 0 0;
+            font-size: 1.2rem;
+        }
+
+        /* Container Styling */
+        .container {
+            max-width: 1200px;
+            margin: 3rem auto;
+            padding: 1rem;
+        }
+
+        /* Simulator Card Styling */
+        .simulator-card {
+            border: 1px solid #ddd;
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            background: white;
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .simulator-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 24px rgba(0, 0, 0, 0.2);
+        }
+        .simulator-card h2 {
+            font-size: 1.8rem;
+            margin: 0 0 0.5rem;
+        }
+        .simulator-card p {
+            margin: 0 0 1rem;
+            line-height: 1.6;
+        }
+        .simulator-card button {
+            background: linear-gradient(90deg, #007BFF, #0056b3);
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: bold;
+            transition: background 0.3s ease;
+        }
+        .simulator-card button:hover {
+            background: linear-gradient(90deg, #0056b3, #003d80);
+        }
+
+        /* Modal Styling */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0.8);
+            background: white;
+            padding: 2rem;
+            box-shadow: 0 16px 32px rgba(0, 0, 0, 0.3);
+            border-radius: 12px;
+            z-index: 1000;
+            transition: transform 0.3s ease, opacity 0.3s ease;
+            opacity: 0;
+        }
+        .modal.active {
+            display: block;
+            transform: translate(-50%, -50%) scale(1);
+            opacity: 1;
+        }
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .modal-header h3 {
+            margin: 0;
+            font-size: 1.5rem;
+        }
+        .modal-body {
+            margin-top: 1rem;
+        }
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #333;
+            transition: color 0.3s ease;
+        }
+        .modal-close:hover {
+            color: #007BFF;
+        }
+
+        /* Overlay Styling */
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            display: none;
+            z-index: 999;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        .overlay.active {
+            display: block;
+            opacity: 1;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .simulator-card {
+                padding: 1rem;
+            }
+            .simulator-card h2 {
+                font-size: 1.5rem;
+            }
+            .simulator-card button {
+                font-size: 0.9rem;
+                padding: 0.5rem 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Portal de Simulações</h1>
+        <p>Simuladores úteis para o seu dia a dia</p>
+    </header>
+
+    <div class="container">
+        <!-- Simulador de Orçamento -->
+        <div class="simulator-card">
+            <h2>Simulador de Orçamento</h2>
+            <p>Calcule seu orçamento baseado em suas receitas e despesas.</p>
+            <button onclick="openSimulator('budgetSimulator')">Abrir Simulador</button>
+        </div>
+
+        <!-- Simulador de Economia -->
+        <div class="simulator-card">
+            <h2>Simulador de Economia</h2>
+            <p>Veja como pequenas economias podem crescer ao longo do tempo.</p>
+            <button onclick="openSimulator('savingsSimulator')">Abrir Simulador</button>
+        </div>
+
+        <!-- Simulador Educacional -->
+        <div class="simulator-card">
+            <h2>Simulador Educativo</h2>
+            <p>Aprenda enquanto simula cenários educativos.</p>
+            <button onclick="openSimulator('educationalSimulator')">Abrir Simulador</button>
+        </div>
+    </div>
+
+    <div class="overlay" id="overlay"></div>
+
+    <div class="modal" id="modal">
+        <div class="modal-header">
+            <h3 id="modal-title">Título do Simulador</h3>
+            <button class="modal-close" onclick="closeModal()">&times;</button>
+        </div>
+        <div class="modal-body" id="modal-body">
+            <p>Conteúdo do simulador será carregado aqui...</p>
+        </div>
+    </div>
+
+    <script>
+        function openSimulator(simulator) {
+            const modal = document.getElementById('modal');
+            const overlay = document.getElementById('overlay');
+            const modalTitle = document.getElementById('modal-title');
+            const modalBody = document.getElementById('modal-body');
+
+            switch (simulator) {
+                case 'budgetSimulator':
+                    modalTitle.textContent = 'Simulador de Orçamento';
+                    modalBody.innerHTML = '<label>Receita Mensal: <input type="number" id="income" placeholder="Ex.: 5000"></label><br><label>Despesas Mensais: <input type="number" id="expenses" placeholder="Ex.: 3000"></label><br><button onclick="calculateBudget()">Calcular</button><p id="budget-result"></p>';
+                    break;
+                case 'savingsSimulator':
+                    modalTitle.textContent = 'Simulador de Economia';
+                    modalBody.innerHTML = '<label>Valor Inicial: <input type="number" id="initialAmount" placeholder="Ex.: 1000"></label><br><label>Taxa de Juros (%): <input type="number" id="interestRate" placeholder="Ex.: 5"></label><br><label>Anos: <input type="number" id="years" placeholder="Ex.: 10"></label><br><button onclick="calculateSavings()">Simular</button><p id="savings-result"></p>';
+                    break;
+                case 'educationalSimulator':
+                    modalTitle.textContent = 'Simulador Educativo';
+                    modalBody.innerHTML = '<p>Conteúdo educativo interativo em breve!</p>';
+                    break;
+                default:
+                    modalTitle.textContent = 'Simulador Não Encontrado';
+                    modalBody.innerHTML = '<p>O simulador solicitado não está disponível.</p>';
+            }
+
+            modal.classList.add('active');
+            overlay.classList.add('active');
+        }
+
+        function closeModal() {
+            const modal = document.getElementById('modal');
+            const overlay = document.getElementById('overlay');
+            modal.classList.remove('active');
+            overlay.classList.remove('active');
+        }
+
+        function calculateBudget() {
+            const income = parseFloat(document.getElementById('income').value);
+            const expenses = parseFloat(document.getElementById('expenses').value);
+            const result = document.getElementById('budget-result');
+
+            if (!isNaN(income) && !isNaN(expenses)) {
+                const balance = income - expenses;
+                result.textContent = `Seu saldo mensal é: R$ ${balance.toFixed(2)}`;
+            } else {
+                result.textContent = 'Por favor, insira valores válidos.';
+            }
+        }
+
+        function calculateSavings() {
+            const initialAmount = parseFloat(document.getElementById('initialAmount').value);
+            const interestRate = parseFloat(document.getElementById('interestRate').value) / 100;
+            const years = parseInt(document.getElementById('years').value);
+            const result = document.getElementById('savings-result');
+
+            if (!isNaN(initialAmount) && !isNaN(interestRate) && !isNaN(years)) {
+                const finalAmount = initialAmount * Math.pow(1 + interestRate, years);
+                result.textContent = `Valor acumulado após ${years} anos: R$ ${finalAmount.toFixed(2)}`;
+            } else {
+                result.textContent = 'Por favor, insira valores válidos.';
+            }
+        }
+    </script>
+</body>
+</html>
